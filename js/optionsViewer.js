@@ -1,6 +1,3 @@
-// Add the mouse movement handlers
-var $body = $('body');
-
 function processOptionsData(optData, calls) {
   var chartWidth = 165;
   var chartDepth = 140;
@@ -36,10 +33,14 @@ function closestIntegerDivisibleByTwo(input) {
   return Math.round(input / 2) * 2;
 }
 
-$body.on('mousedown', function (evt) {
+// Add the mouse movement handlers
+var $container = $('.container');
+
+
+$container.on('mousedown touchstart', function (evt) {
   var initX = evt.screenX;
   var initY = evt.screenY;
-  $body.on('mousemove', function handler(evt) {
+  $container.on('mousemove touchmove', function handler(evt) {
     // drag
     var moveX = initX - evt.screenX;
     var moveY = initY - evt.screenY;
@@ -47,12 +48,11 @@ $body.on('mousedown', function (evt) {
     var xRot = moveY / 2;
     position.update(zRot, xRot);
   });
-  $body.on('mouseup', function handler(evt) {
-    $body.off('mousemove');
+  $container.on('mouseup touchend', function handler(evt) {
+    $container.off('mousemove touchmove');
     position.resetRotation();
   });
 });
-
 
 
 $(document).ready(function () {
