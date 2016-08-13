@@ -33,17 +33,22 @@ function closestIntegerDivisibleByTwo(input) {
   return Math.round(input / 2) * 2;
 }
 
+
 // Add the mouse movement handlers
 var $container = $('.container');
 
 
 $container.on('mousedown touchstart', function (evt) {
-  var initX = evt.screenX;
-  var initY = evt.screenY;
+  var initX = 0;
+  var initY = 0;
+  var mousePos = getMousePosition(evt);
+  initX = mousePos.xPos;
+  initY = mousePos.yPos;
   $container.on('mousemove touchmove', function handler(evt) {
     // drag
-    var moveX = initX - evt.screenX;
-    var moveY = initY - evt.screenY;
+    var mousePos = getMousePosition(evt);
+    var moveX = initX - mousePos.xPos;
+    var moveY = initY - mousePos.yPos;
     var zRot = moveX / 3;
     var xRot = moveY / 2;
     position.update(zRot, xRot);
@@ -54,6 +59,17 @@ $container.on('mousedown touchstart', function (evt) {
   });
 });
 
+function getMousePosition(evt) {
+  var event = evt;
+  if (evt.type == 'touchstart' || evt.type == 'touchmove') {
+     event = evt.originalEvent.touches[0];
+     evt.preventDefault();
+  }
+  return {
+     xPos : event.pageX,
+     yPos : event.pageY
+  }  
+}
 
 $(document).ready(function () {
   // Do the initial rendering
