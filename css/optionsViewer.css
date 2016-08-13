@@ -1,14 +1,12 @@
 body {
   background-color: #CCCCCC;
-  width: 700px;
-  height: 700px;
 }
 
 .container {
   position: absolute;
   perspective: 400px;
   height: 400px;
-  width: 600px;
+  width: 350px;
   margin: 0;
   margin-top: 50px;
   padding: 0;
@@ -76,6 +74,7 @@ body {
 }
 
 h1 {
-  margin-left: 60px;
+  margin-left: 30px;
   font-family: Helvetica, Arial, Sans-Serif;
+  font-size: 1.8em;
 }
