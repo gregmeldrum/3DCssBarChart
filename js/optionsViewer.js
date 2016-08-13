@@ -36,6 +36,8 @@ function closestIntegerDivisibleByTwo(input) {
   return Math.round(input / 2) * 2;
 }
 
+$('.container').selectable();
+
 $body.on('mousedown', function (evt) {
   var initX = evt.screenX;
   var initY = evt.screenY;
@@ -52,7 +54,6 @@ $body.on('mousedown', function (evt) {
     position.resetRotation();
   });
 });
-
 
 
 $(document).ready(function () {
