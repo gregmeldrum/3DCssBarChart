@@ -17,6 +17,13 @@ body {
 .scene {
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
+  -webkit-transform-origin: 50% 50%;
+  -webkit-transform-style: preserve-3d;
+
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .scene .base {
