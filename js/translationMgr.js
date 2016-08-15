@@ -6,7 +6,7 @@ var position = (function () {
   var prevZRot = 0;
   var prevXRot = 0;
 
-  var zRot = 10;
+  var zRot = 35;
   var xRot = 65;
 
   function update(newZRot, newXRot) {
