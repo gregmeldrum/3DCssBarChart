@@ -1,47 +1,40 @@
-/**
- * TODO: make barchart generic instead of tangling it with the options data
- */
-
 function BarChart(topOffset, leftOffset, barWidth, barDepth,
-                  optData, calls, parentElement, chartMaxHeight) {
+                  data, parentElement, chartMaxHeight) {
   this.topOffset = topOffset;
   this.leftOffset = leftOffset;
   this.barWidth = barWidth;
   this.barDepth = barDepth;
-  this.calls = calls;
   this.parentElement = parentElement;
   this.chartMaxHeight = chartMaxHeight;
   
   /*
-   * Get the minimum and maximum price data. This can be used to scale
+   * Get the minimum and maximum data values. This can be used to scale
    * the z axis of the graph
    */
-  this.getDataMinMax = function getDataMinMax(optData, calls, chartMaxHeight) {
-    // Loop over expiry date
+  this.getDataMinMax = function getDataMinMax(data, chartMaxHeight) {
     var minPrice = 9999;
     var maxPrice = 0;
-    for (var expiryIdx = 0; expiryIdx < optData.length; expiryIdx++) {
-      var expirationData = optData[expiryIdx];
-      for (var strikePriceIdx = 0; strikePriceIdx < expirationData.strikePrices.length; strikePriceIdx++) {
-        var priceData = expirationData.strikePrices[strikePriceIdx];
-        if (calls) {
-          minPrice = Math.min(minPrice, priceData.data.callLastTrade);
-          maxPrice = Math.max(maxPrice, priceData.data.callLastTrade);
-        } else {
-          minPrice = Math.min(minPrice, priceData.data.putLastTrade);
-          maxPrice = Math.max(maxPrice, priceData.data.putLastTrade);
-        }
-      }
-    }
+
+    data.data.forEach(function(yArray, xIdx){
+       yArray.forEach(function(zValue, yIdx){
+          minPrice = Math.min(minPrice, zValue);
+          maxPrice = Math.max(maxPrice, zValue);
+       })
+    })
     return {
       minPrice: minPrice,
       maxPrice: maxPrice
     };
   };
  
+  // Yeah, i am doing the this/that thing
+  // so the closures have access to the currect
+  // object's this value
+  var that = this;
 
-  this.dataMinMax = this.getDataMinMax(optData, calls, chartMaxHeight);
+  this.dataMinMax = this.getDataMinMax(data, chartMaxHeight);
 
+  console.log(this.dataMinMax);
   // For now, Assume we start at 0 instead of priceMin
   // TODO: Use the min price to set the min z axis
   this.heightMultiplier = this.chartMaxHeight / this.dataMinMax.maxPrice;
@@ -51,66 +44,66 @@ function BarChart(topOffset, leftOffset, barWidth, barDepth,
 
   // Create the dom elements that make up the 3D Bar Chart
   this.render = function () {
-    for (var expiryIdx = 0; expiryIdx < optData.length; expiryIdx++) {
-      var expirationData = optData[optData.length - expiryIdx - 1];
-      for (var strikePriceIdx = 0; strikePriceIdx < expirationData.strikePrices.length; strikePriceIdx++) {
-        var priceData = expirationData.strikePrices[strikePriceIdx];
-        this.drawBar(expiryIdx, strikePriceIdx, priceData);
-      }
-    }
+    data.data.forEach(function(yArray, xIdx){
+       yArray.forEach(function(zValue, yIdx){
 
-    this.drawStrikePriceLabel();   
-    this.drawExpirationPriceLabel();
+          that.drawBar(xIdx, yArray.length - yIdx - 1, zValue);
+       })
+    })
+
+    this.drawXLabel();   
+    this.drawYLabel();
     this.drawZPlanes();   
   }
 
   /*
-   * Draw the labels for the 3 axis
+   * Draw the labels for the y Axis
    */
-  this.drawExpirationPriceLabel = function () {
-    for (var expiryIdx = 0; expiryIdx < optData.length; expiryIdx++) {
-      var expirationData = optData[optData.length - expiryIdx - 1];
-      //console.log(expirationData);
-      var expDate = new Date(expirationData.expiry);
+  this.drawYLabel = function () {
+    data.yLabels.forEach(function(yLabel, yIdx) {
+      var expDate = new Date(yLabel);
       var dateComponents = expDate.toString().split(' ');
-      var labelOffset = leftOffset + expirationData.strikePrices.length * this.barWidth  - (this.barWidth / 2);
-      var textTranslation = expiryIdx * barDepth;
+      var labelOffset = leftOffset + (data.xLabels.length * that.barWidth)  - (that.barWidth / 2);
+      var textTranslation = (data.yLabels.length - yIdx - 1) * barDepth;
 
-      var yLabel1 = this.drawLabel('label', topOffset, labelOffset,
+      var yLabel1 = that.drawLabel('label', topOffset, labelOffset,
                         'rotateX(-90deg) translateZ(' + (textTranslation + 10) + 'px) translateY(4px) rotateY(90deg)',
                         dateComponents[1]);
-      var yLabel2 = this.drawLabel('label', topOffset, labelOffset,
+      var yLabel2 = that.drawLabel('label', topOffset, labelOffset,
                         'rotateX(-90deg) translateZ(' + (textTranslation + 10) + 'px) translateY(17px) rotateY(90deg)',
                         dateComponents[2]);
-      var yLabel3 = this.drawLabel('label', topOffset, labelOffset,
+      var yLabel3 = that.drawLabel('label', topOffset, labelOffset,
                         'rotateX(-90deg) translateZ(' + (textTranslation + 10) + 'px) translateY(30px) rotateY(90deg)',
                         dateComponents[3]);
       parentElement.append(yLabel1);
       parentElement.append(yLabel2);
       parentElement.append(yLabel3);
-    }
+       
+    });
   }
 
-  this.drawStrikePriceLabel = function () {
-    for (var strikeIdx = 0; strikeIdx < optData[0].strikePrices.length; strikeIdx++) {
-      var strikePrice = optData[0].strikePrices[strikeIdx].strikePrice;
-      //console.log(strikePrice);
-      var barLeftOffset = leftOffset + (strikeIdx * barWidth);
-      var textTranslation = optData.length * barDepth;
-      var xLabel = this.drawLabel('label', topOffset, barLeftOffset,
+  // Draw the X axis labels
+  this.drawXLabel = function () {
+    data.xLabels.forEach(function(xLabelValue, xIdx) {
+      //console.log(xLabelValue);
+      var barLeftOffset = leftOffset + (xIdx * barWidth);
+      var textTranslation = data.yLabels.length * barDepth;
+      var xLabel = that.drawLabel('label', topOffset, barLeftOffset,
                    'rotateX(-90deg) translateZ(' + textTranslation + 'px) translateY(4px)',
-                   strikePrice);
+                   xLabelValue);
       parentElement.append(xLabel);
-    }
+
+    });
   }
 
+  // Draw the planes in the Z axis
   this.drawZPlanes = function() {
      var numOfZAxisPlanes = 4;
      var zAxisPlaneScale = this.getZAxisScale(numOfZAxisPlanes);
      console.log("zAxisPlaneScale %", zAxisPlaneScale);
      for (var planeIdx = 0; planeIdx <= numOfZAxisPlanes; planeIdx++) {
-         var width = optData[0].strikePrices.length * this.barWidth;
-         var depth = optData.length * this.barDepth;
+         var width = data.xLabels.length * this.barWidth;
+         var depth = data.yLabels.length * this.barDepth;
          var plane = this.drawZAxisPlane(this.topOffset, this.leftOffset,  width, depth,
                              'translateZ(' + zAxisPlaneScale * planeIdx * this.heightMultiplier + 'px)');
          var value1 = this.drawLabel('label', this.topOffset, this.leftOffset,
@@ -126,6 +119,7 @@ function BarChart(topOffset, leftOffset, barWidth, barDepth,
      }
   };
 
+  // Determine the scale of the Z axis
   this.getZAxisScale = function(numOfZAxisPlanes) {
      // Assume range starts at 0
      var range = this.dataMinMax.maxPrice - 0;
@@ -136,25 +130,24 @@ function BarChart(topOffset, leftOffset, barWidth, barDepth,
      var diff = 9999;
      for (var idx = 0; idx < steps.length; idx++) {
        var currentDiff = Math.abs(steps[idx] - roughSteps);
-        console.log("roughSteps %s steps[idx] %s currentDiff %s diff %s", roughSteps, steps[idx], currentDiff, diff);
-      if (currentDiff > diff) {
-         // We've found the closest step unit
-         return steps[idx - 1];
+       //console.log("roughSteps %s steps[idx] %s currentDiff %s diff %s", roughSteps, steps[idx], currentDiff, diff);
+       if (currentDiff > diff) {
+          // We've found the closest step unit
+          return steps[idx - 1];
        } else {
-         diff = currentDiff;
+          diff = currentDiff;
        }
      }
   }
 
-
-  this.drawBar = function drawBar(expiryIdx, strikePriceIdx, priceData) {
-    var price = ((calls) ? priceData.data.callLastTrade : priceData.data.putLastTrade);
+  this.drawBar = function drawBar(xIdx, yIdx, zValue) {
+    var price = zValue;
     var height = Math.ceil(this.heightMultiplier * price);
     var color = gradient.getColor(height / this.chartMaxHeight);
 
-    var idString = expiryIdx + strikePriceIdx;
-    var barTopOffset = topOffset + (expiryIdx * barDepth);
-    var barLeftOffset = leftOffset + (strikePriceIdx * barWidth);
+    var idString = yIdx + xIdx;
+    var barTopOffset = topOffset + (yIdx * barDepth);
+    var barLeftOffset = leftOffset + (xIdx * barWidth);
 
     var backFace = this.drawBarFace('back' + idString,
       barTopOffset, barLeftOffset, barWidth, height, 'rotateX(90deg)', gradient.darken(color, .5));
