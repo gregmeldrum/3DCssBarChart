@@ -1,8 +1,8 @@
 /*
- * Create an object to manage the translation (rotation)
+ * Create an object to manage the transformation (rotation)
  * of the dom subtree
  */
-var position = (function () {
+var transformationManager = (function () {
   var prevZRot = 0;
   var prevXRot = 0;
 
