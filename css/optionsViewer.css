@@ -2,7 +2,7 @@ body {
   background-color: #CCCCCC;
 }
 
-.container {
+.barChartContainer {
   position: absolute;
   perspective: 400px;
   height: 400px;
