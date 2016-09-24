@@ -165,13 +165,20 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
   this.drawZPlanes = function () {
     var numOfZAxisPlanes = 4;
     var zAxisPlaneScale = this.getZAxisScale(numOfZAxisPlanes);
-    console.log("zAxisPlaneScale %", zAxisPlaneScale);
+    //console.log("zAxisPlaneScale %", zAxisPlaneScale);
+
+    // Figure out how many planes to render
+    if (this.dataMinMax.maxPrice > (4 * zAxisPlaneScale)) {
+      // Draw an extra plane if the max data exceeds the 4th plane
+      numOfZAxisPlanes = 5;
+    } 
+
     for (var planeIdx = 0; planeIdx <= numOfZAxisPlanes; planeIdx++) {
-      var width = data.xLabels.length * this.barWidth;
-      var depth = data.yLabels.length * this.barDepth;
+      var width = this.data.xLabels.length * this.barWidth;
+      var depth = this.data.yLabels.length * this.barDepth;
       var plane = this.drawZAxisPlane(this.topOffset, this.leftOffset, width, depth,
         'translateZ(' + zAxisPlaneScale * planeIdx * this.heightMultiplier + 'px)');
-      var value1 = this.drawLabel('label', this.topOffset, this.leftOffset,
+      var value1 = this.drawLabel('label zlabel', this.topOffset, this.leftOffset,
         'translateZ(' + (zAxisPlaneScale * planeIdx * this.heightMultiplier + 5) + 'px) rotateX(-90deg) translateX(-30px)',
         zAxisPlaneScale * planeIdx);
       //var value2 = this.drawLabel('label', this.topOffset, this.leftOffset,
@@ -210,7 +217,7 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
     var height = Math.ceil(this.heightMultiplier * zValue);
     var color = this.gradient.getColor(height / this.chartMaxHeight);
 
-    var idString = yIdx + xIdx;
+    var idString = yIdx + "" + xIdx;
     var barTopOffset = this.topOffset + (yIdx * this.barDepth);
     var barLeftOffset = this.leftOffset + (xIdx * this.barWidth);
 
@@ -285,7 +292,7 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
       .text(text);
   };
 
-  this.bindMouseHandler = function(sceneRotationManager) {
+  this.bindMouseHandler = function (sceneRotationManager) {
     // Set the initial position
     sceneRotationManager.update(0, 0);
 
@@ -326,6 +333,54 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
         sceneRotationManager.resetRotation();
       });
     });
+  }
+
+  this.resizeBar = function (xIdx, yIdx, zValue) {
+    var idString = yIdx + "" + xIdx;
+    var height = Math.ceil(this.heightMultiplier * zValue);
+
+    // Animate the top
+    $("#back" + idString).animate({
+      'height': height
+    },
+      {
+        step: function (now, fx) {
+          $("#top" + idString).css({
+            "transform": 'translateZ(' + now + 'px)',
+            "-webkit-transform": 'translateZ(' + now + 'px)',
+            "-ms-transform": 'translateZ(' + now + 'px)'
+          });
+          $(this).css({"height": now});
+          $("#front" + idString).css({"height": now});
+          $("#left" + idString).css({"height": now});
+          $("#right" + idString).css({"height": now});
+        },
+        duration: 500,
+        easing: 'linear',
+        queue: false,
+      }
+    );
+  }
+
+  this.rerender = function (optionData) {
+    this.data = optionData;
+
+    // recalculate the min/max
+    this.dataMinMax = this.getDataMinMax(this.data, this.chartMaxHeight);
+    this.heightMultiplier = this.chartMaxHeight / this.dataMinMax.maxPrice;
+
+    // Remove the planes
+    $(".plane").remove();
+    $(".zlabel").remove();
+    this.drawZPlanes();
+
+    // Loop through the data
+    this.data.data.forEach(function (yArray, xIdx) {
+      yArray.forEach(function (zValue, yIdx) {
+        that.resizeBar(xIdx, yArray.length - yIdx - 1, zValue);
+      })
+    });
+
   }
 
   // Initialize the barchart object

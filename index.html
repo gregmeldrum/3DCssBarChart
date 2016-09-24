@@ -2,18 +2,28 @@
 <html>
 
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
   <link href="css/optionsViewer.css" rel="stylesheet">
-  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"> 
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
 </head>
 
 <body>
-  <h1>AAPL Call Options</h1>
+  <h1>AAPL Options</h1>
   <div class="barChartContainer">
-    <!--div id="scene" class="scene">
-      <figure class="base"></figure>
-    </div-->
   </div>
+
+  <!-- Switch -->
+  <div id="switch-container" class="switch">
+    <label>
+      Calls
+      <input type="checkbox" onclick="callPutToggleManager.toggle()">
+      <span class="lever"></span>
+      Puts
+    </label>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
   <script src="js/optionsData.js"></script>
   <script src="js/gradient.js"></script>
   <script src="js/barChart.js"></script>

@@ -49,3 +49,13 @@ var transformationManager = (function () {
     resetRotation: resetRotation
   };
 })();
+
+var callPutToggleManager = (function(){
+   function toggle(){
+       optionBarChart.toggleCallPut();
+   }
+
+   return {
+      toggle: toggle
+   }
+})();

@@ -1,4 +1,11 @@
-function processOptionsData(optData, calls) {
+var optionBarChart = (function (calls) {
+
+  var chartWidth = 165;
+  var chartDepth = 140;
+  var chartMaxHeight = 127;
+  var useCallData = calls;
+  var barChart3d;
+  var optionsData;
 
   // Convert the options data into the format the
   // BarChart3d object is expecting
@@ -34,23 +41,35 @@ function processOptionsData(optData, calls) {
         }
 
         // Set the z value depending if its a put or a call
-        barChartData.data[strikeIdx][expIdx] = (calls ? strikePriceData.data.callLastTrade : strikePriceData.data.putLastTrade)
+        barChartData.data[strikeIdx][expIdx] = (useCallData ? strikePriceData.data.callLastTrade : strikePriceData.data.putLastTrade)
       })
     })
     return barChartData;
   }
 
+  function render(optData) {
+    // Store the options data
+    optionsData = optData;
 
-  // Set the height, width and depth of the graph
-  var chartWidth = 165;
-  var chartDepth = 140;
-  var chartMaxHeight = 127;
-  var barChartData = normalizeData(optData);
-  var barChart3d = new BarChart3D(chartWidth, chartDepth, chartMaxHeight, barChartData, transformationManager);
-}
+    // Set the height, width and depth of the graph
+    var barChartData = normalizeData(optionsData);
+    barChart3d = new BarChart3D(chartWidth, chartDepth, chartMaxHeight, barChartData, transformationManager);
+  }
+
+  function toggleCallPut() {
+    useCallData = !useCallData;
+
+    var barChartData = normalizeData(optionsData);
+    barChart3d.rerender(barChartData);
+  }
+
+  return {
+    render: render,
+    toggleCallPut: toggleCallPut
+  }
+})(true);
 
 //
 // Starting point
 //
-processOptionsData(optionsData, true /*call data*/);
-
+optionBarChart.render(optionsData);
