@@ -5,6 +5,10 @@ body {
 .barChartContainer {
   position: absolute;
   perspective: 400px;
+  -webkit-perspective: 400px;
+  -moz-perspective: 400px;
+  -o-perspective: 400px;
+  -ms-perspective: 400px;
   height: 400px;
   width: 350px;
   margin: 0;
@@ -19,11 +23,19 @@ body {
   transform-style: preserve-3d;
   -webkit-transform-origin: 50% 50%;
   -webkit-transform-style: preserve-3d;
+  -moz-transform-origin: 50% 50%;
+  -moz-transform-style: preserve-3d;
+  -o-transform-origin: 50% 50%;
+  -o-transform-style: preserve-3d;
+  -ms-transform-origin: 50% 50%;
+  -ms-transform-style: preserve-3d;
 
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
 }
 
 .scene .base {
@@ -65,6 +77,10 @@ body {
   display: block;
   position: absolute;
   transform-origin: center top;
+  -webkit-transform-origin: center top;
+  -moz-transform-origin: center top;
+  -ms-transform-origin: center top;
+  -o-transform-origin: center top;
   border: 0px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.6em;

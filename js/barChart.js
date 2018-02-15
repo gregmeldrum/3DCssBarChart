@@ -260,6 +260,8 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
         'transform': transform,
         '-webkit-transform': transform,
         '-ms-transform': transform,
+        '-moz-transform': transform,
+        '-o-transform': transform,
         'background-color': '#' + color
       });
   };
@@ -274,6 +276,8 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
         'height': height,
         '-webkit-transform': transform,
         '-ms-transform': transform,
+        '-moz-transform': transform,
+        '-o-transform': transform,
         'transform': transform
       });
   };
@@ -287,6 +291,8 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
         'left': left,
         '-webkit-transform': transform,
         '-ms-transform': transform,
+        '-moz-transform': transform,
+        '-o-transform': transform,
         'transform': transform,
       })
       .text(text);
@@ -348,7 +354,9 @@ function BarChart3D(chartWidth, chartDepth, chartMaxHeight, data, sceneRotationM
           $("#top" + idString).css({
             "transform": 'translateZ(' + now + 'px)',
             "-webkit-transform": 'translateZ(' + now + 'px)',
-            "-ms-transform": 'translateZ(' + now + 'px)'
+            "-ms-transform": 'translateZ(' + now + 'px)',
+            "-moz-transform": 'translateZ(' + now + 'px)',
+            "-o-transform": 'translateZ(' + now + 'px)'
           });
           $(this).css({"height": now});
           $("#front" + idString).css({"height": now});
